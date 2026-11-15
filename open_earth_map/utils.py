@@ -63,7 +63,8 @@ def make_mask(a, grey_codes: dict = class_grey_oem, rgb_codes: dict = class_rgb_
     return out
 
 
-def save_model(model, epoch: int, best_score: float, model_name: str, output_dir: str):
+def save_model(model, epoch: int, best_score: float, model_name: str, output_dir: str,
+               model_config=None, input_config=None):
     """_summary_
 
     Args:
@@ -74,7 +75,8 @@ def save_model(model, epoch: int, best_score: float, model_name: str, output_dir
         output_dir (str): path to the output directory
     """
     torch.save(
-        {"state_dict": model.state_dict(), "epoch": epoch, "best_score": best_score},
+        {"state_dict": model.state_dict(), "epoch": int(epoch), "best_score": float(best_score),
+         "model_config": model_config, "input_config": input_config},
         os.path.join(output_dir, model_name),
     )
     print("model saved")

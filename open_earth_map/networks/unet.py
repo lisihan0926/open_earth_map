@@ -3,7 +3,6 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-
 class UNet(nn.Module):
     def __init__(
         self,
@@ -14,6 +13,8 @@ class UNet(nn.Module):
         padding: bool = True,
         batch_norm: bool = False,
         up_mode: str = "upconv",
+        quantum_enabled: bool = False,
+        quantum_layers: int = 2,
     ):
         """
         Implementation of
@@ -48,6 +49,12 @@ class UNet(nn.Module):
                 UNetConvBlock(in_channels, 2 ** (wf + i), padding, batch_norm)
             )
             in_channels = 2 ** (wf + i)
+        #这里传入通道数    
+        if quantum_enabled:
+            from .quantum_attention import Quantum
+            self.quantum = Quantum(in_channels=in_channels, n_layers=quantum_layers)
+        else:
+            self.quantum = nn.Identity()
 
         self.up_path = nn.ModuleList()
         for i in reversed(range(depth - 1)):
@@ -66,7 +73,10 @@ class UNet(nn.Module):
             x = down(x)
             if i != len(self.down_path) - 1:
                 blocks.append(x)
-                x = F.max_pool2d(x, 2)
+                x = F.max_pool2d(x, 2)#这里是池化
+        # 此时 in_channels 就是编码器最后输出的通道数
+        x = self.quantum(x)
+
 
         for i, up in enumerate(self.up_path):
             x = up(x, blocks[-i - 1])

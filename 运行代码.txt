@@ -1,0 +1,8 @@
+仅经典网络：
+python demo_training.py --variant baseline --epochs 30 --seed 42
+python demo_testing.py --variant baseline --checkpoint outputs_comparison/baseline/seed_42/model_quantum.pth
+python demo_training.py --variant quantum_only --epochs 30 --seed 42
+量子+经典：
+python demo_testing.py --variant baseline --split val --limit 2
+python demo_testing.py --variant quantum --split val --limit 2
+python demo_testing.py --variant quantum_only --split val --limit 2
